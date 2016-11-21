@@ -14,7 +14,7 @@
 
 /*
  * Gazebo Plugin:  ardupilot_sitl_gazebo_plugin
- * Description: 
+ * Description:
  *   Implements plugin's methods related to communication with Gazebo.
  *   e.g. initialization, Gazebo topics subscriptions, callback methods
  */
@@ -60,7 +60,7 @@ bool ArdupilotSitlGazeboPlugin::init_gazebo_side(physics::WorldPtr world, sdf::E
     //    continue;
     //}
     //ROS_INFO("Rover model inserted!");
-    
+
     // Setup Gazebo node infrastructure
 
     if (_sdf->HasElement("UAV_MODEL"))
@@ -76,9 +76,9 @@ bool ArdupilotSitlGazeboPlugin::init_gazebo_side(physics::WorldPtr world, sdf::E
 
     // Initialize the node with the world name
     node->Init(_parent_world->GetName());
-    
+
     _parent_world->SetPaused(true);
-    
+
     // Create a publisher on the ~/physics topic
     transport::PublisherPtr physicsPub = node->Advertise<msgs::Physics>("~/physics");
     msgs::Physics physicsMsg;
@@ -88,11 +88,11 @@ bool ArdupilotSitlGazeboPlugin::init_gazebo_side(physics::WorldPtr world, sdf::E
     // TODO: pass it to parametric
     physicsMsg.set_max_step_size(STEP_SIZE_FOR_ARDUPILOT);
     physicsPub->Publish(physicsMsg);
-    
+
     _controlSub = node->Subscribe("~/world_control", &ArdupilotSitlGazeboPlugin::on_gazebo_control, this);
-    
+
     _modelInfoSub = node->Subscribe("~/model/info", &ArdupilotSitlGazeboPlugin::on_gazebo_modelInfo, this);
-    
+
     std::string topicNameBuf = std::string("/") + _modelName + "/command/motor_speed";
     this->velSub = _rosnode->subscribe(topicNameBuf.c_str(), 100, &ArdupilotSitlGazeboPlugin::OnVelMsg, this);
     //this->newFrameConnection = this->camera->ConnectNewImageFrame(
@@ -102,7 +102,7 @@ bool ArdupilotSitlGazeboPlugin::init_gazebo_side(physics::WorldPtr world, sdf::E
           boost::bind(&ArdupilotSitlGazeboPlugin::on_gazebo_update, this));
 
     // Or we could also use 'ConnectWorldUpdateBegin'
-    // For a list of all available connection events, see: Gazebo-X.X/gazebo/common/Events.hh 
+    // For a list of all available connection events, see: Gazebo-X.X/gazebo/common/Events.hh
 
     ROS_INFO("Gazebo side initialized");
     return true;
@@ -131,7 +131,7 @@ double ArdupilotSitlGazeboPlugin::get_collision_radius(physics::CollisionPtr _co
   return 0;
 }
 
-    
+
 //-------------------------------------------------
 //  Gazebo communication
 //-------------------------------------------------
@@ -157,7 +157,7 @@ void ArdupilotSitlGazeboPlugin::on_gazebo_update()
 {
     // This method is executed independently from the main loop thread.
     // Beware of access to shared variables memory. USe mutexes if required.
-    
+
     // Get the simulation time
     gazebo::common::Time gz_time_now = _parent_world->GetSimTime();
     // Converts it to seconds
@@ -169,7 +169,7 @@ void ArdupilotSitlGazeboPlugin::on_gazebo_update()
         _timeMsgAlreadyDisplayed = true;
     }
 }
-    
+
 /*
   Emulates the Pause GUI button functionnality.
   Shortcomings: The GUI button does not change shape between Play/Resume
@@ -178,16 +178,16 @@ void ArdupilotSitlGazeboPlugin::on_gazebo_control(ConstWorldControlPtr &_msg)
 {
     // This method is executed independently from the main loop thread.
     // Beware of access to shared variables memory. Use mutexes if required.
-    
+
     if (_msg->has_pause()) {
         // The plugin's running principle, based on explicit calls to Gazebo's step() method,
         // requires Gazebo to be in a continuous pause state.
         // Indeed, Gazebo must permanently remain in pause, until the next call to step().
         // Therefore the state of the GUI play/pause button is not reliable, and the
         // actual play/pause state must be handled here, with '_isSimPaused'.
-        
+
         _isSimPaused = !_isSimPaused;
-        
+
         if (_isSimPaused) {
             _parent_world->SetPaused(true);
             ROS_INFO( PLUGIN_LOG_PREPEND "Simulation is now paused");
@@ -229,16 +229,16 @@ void ArdupilotSitlGazeboPlugin::on_rover_model_loaded(){
     if (!this->flWheelSteeringJoint)
         gzthrow("could not find front left steering joint\n");
 
-    // stop_erp == 0 means no position correction torques will act        
-    this->flWheelJoint->SetParam("stop_erp", 0, 0.0);       
-    this->frWheelJoint->SetParam("stop_erp", 0, 0.0);       
-    this->blWheelJoint->SetParam("stop_erp", 0, 0.0);       
+    // stop_erp == 0 means no position correction torques will act
+    this->flWheelJoint->SetParam("stop_erp", 0, 0.0);
+    this->frWheelJoint->SetParam("stop_erp", 0, 0.0);
+    this->blWheelJoint->SetParam("stop_erp", 0, 0.0);
     this->brWheelJoint->SetParam("stop_erp", 0, 0.0);
 
-    // Apply small damping to the joints    
-    this->flWheelJoint->SetParam("stop_cfm", 0, 10.0);      
-    this->frWheelJoint->SetParam("stop_cfm", 0, 10.0);      
-    this->blWheelJoint->SetParam("stop_cfm", 0, 10.0);      
+    // Apply small damping to the joints
+    this->flWheelJoint->SetParam("stop_cfm", 0, 10.0);
+    this->frWheelJoint->SetParam("stop_cfm", 0, 10.0);
+    this->blWheelJoint->SetParam("stop_cfm", 0, 10.0);
     this->brWheelJoint->SetParam("stop_cfm", 0, 10.0);
 
 }
@@ -251,9 +251,9 @@ void ArdupilotSitlGazeboPlugin::on_gazebo_modelInfo(ConstModelPtr &_msg)
 {
     // This method is executed independently from the main loop thread.
     // Beware of access to shared variables memory. Use mutexes if required.
-    
+
     ROS_INFO( "NEW MODEL : name %s", _msg->name().c_str());
-    
+
     if (!_msg->name().compare("rover")) {
         ROS_INFO("There is Rover !");
         roverSpawn = true;
@@ -266,21 +266,21 @@ void ArdupilotSitlGazeboPlugin::on_gazebo_modelInfo(ConstModelPtr &_msg)
   Moves the rover model according to motor speed values
 */
 void ArdupilotSitlGazeboPlugin::OnVelMsg(const mav_msgs::CommandMotorSpeed msg)
-{   
+{
     if (roverSpawn){
 
         //Normalize values
         double yaw = (500.0 - msg.motor_speed[0]) * 0.7727 / 400.0;
-        double throttle = (msg.motor_speed[2] - 500.0) / 80.0 + 0.0875;
-                
+        double throttle = (msg.motor_speed[2] - 500.0) / 80.0;
+
         this->frWheelSteeringJoint->SetPosition(0, yaw);
         this->flWheelSteeringJoint->SetPosition(0, yaw);
 
-        this->flWheelJoint->SetVelocity(0, throttle); 
+        this->flWheelJoint->SetVelocity(0, throttle);
         this->frWheelJoint->SetVelocity(0, throttle);
         this->blWheelJoint->SetVelocity(0, throttle);
         this->brWheelJoint->SetVelocity(0, throttle);
-    }    
+    }
 }
 
 
