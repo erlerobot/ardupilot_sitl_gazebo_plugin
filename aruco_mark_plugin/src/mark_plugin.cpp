@@ -5,11 +5,11 @@
 #include <stdio.h>
 
 // Circle radius
-#define RADIUS 3
+#define RADIUS 1
 
 // Square height and width
-#define HEIGHT 3
-#define WIDTH  3
+#define HEIGHT 0.5
+#define WIDTH  1
 
 // Define shapes
 #define CIRCLE 0
@@ -81,7 +81,7 @@ namespace gazebo
 
       // Hardcoded for testing
       // shape = SQUARE; 
-      STEP = 0.0005; 
+      STEP = 0.0002; 
 
       status = INITIAL;
 
